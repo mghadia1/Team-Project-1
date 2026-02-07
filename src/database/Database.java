@@ -27,9 +27,10 @@ public class Database {
 	private Statement statement = null;
 	
 	private String currentUsername;
-	// currentPassword stores the BCrypt hash (not plaintext) for the current session
-	// This field is maintained for potential backwards compatibility but should NOT be used for password verification
-	// Password verification must use BCrypt.checkpw() in the login methods
+	// DEPRECATED: currentPassword stores the BCrypt hash (not plaintext) for the current session
+	// This field is NO LONGER USED for password verification and should not be used
+	// Password verification MUST use BCrypt.checkpw() in the loginAdmin/Role1/Role2 methods
+	// This field is maintained only to avoid breaking potential external dependencies on getCurrentPassword()
 	private String currentPassword;
 	private String currentFirstName;
 	private String currentMiddleName;
