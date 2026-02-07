@@ -193,7 +193,7 @@ java -jar junit-platform-console-standalone.jar --class-path out --select-class 
 - ✅ All database operations use try-with-resources to prevent resource leaks
 - ✅ Prepared statements used throughout to prevent SQL injection
 - ✅ Input validation enforced before any database operations
-- ✅ Password hashing cost factor can be adjusted in `Database.java` if needed for future hardware
+- ✅ Password hashing cost factor can be adjusted via `BCRYPT_COST_FACTOR` constant in `Database.java` if needed for future hardware
 
 ---
 

@@ -19,6 +19,9 @@ public class Database {
 
 	static final String USER = "sa"; 
 	static final String PASS = ""; 
+	
+	// BCrypt cost factor for password hashing (2^12 rounds)
+	private static final int BCRYPT_COST_FACTOR = 12;
 
 	private Connection connection = null;
 	private Statement statement = null;
@@ -104,10 +107,10 @@ public class Database {
 		try (PreparedStatement pstmt = connection.prepareStatement(insertUser)) {
 			currentUsername = user.getUserName();
 			pstmt.setString(1, currentUsername);
-			// Hash the password using BCrypt with cost factor 12
-			String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt(12));
-			currentPassword = hashedPassword;
+			// Hash the password using BCrypt with configured cost factor
+			String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt(BCRYPT_COST_FACTOR));
 			pstmt.setString(2, hashedPassword);
+			currentPassword = hashedPassword;  // Track hashed password in current session
 			currentFirstName = user.getFirstName();
 			pstmt.setString(3, currentFirstName);
 			currentMiddleName = user.getMiddleName();
@@ -582,13 +585,13 @@ public class Database {
 	public void updatePassword(String username, String newPassword) {
 	    String query = "UPDATE userDB SET password = ? WHERE username = ?";
 	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-	        // Hash the password using BCrypt with cost factor 12
-	        String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt(12));
+	        // Hash the password using BCrypt with configured cost factor
+	        String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt(BCRYPT_COST_FACTOR));
 	        pstmt.setString(1, hashedPassword);
 	        pstmt.setString(2, username);
 	        pstmt.executeUpdate();
 	        if (username.equals(currentUsername)) {
-	            currentPassword = hashedPassword;
+	            currentPassword = hashedPassword;  // Track hashed password in current session
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
