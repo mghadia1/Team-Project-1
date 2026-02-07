@@ -27,7 +27,7 @@ public class Database {
 	private Statement statement = null;
 	
 	private String currentUsername;
-	private String currentPassword;
+	private String currentPassword;  // Stores BCrypt hash, not plaintext - should not be used for verification
 	private String currentFirstName;
 	private String currentMiddleName;
 	private String currentLastName;
