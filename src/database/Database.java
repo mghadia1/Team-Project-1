@@ -27,7 +27,10 @@ public class Database {
 	private Statement statement = null;
 	
 	private String currentUsername;
-	private String currentPassword;  // Stores BCrypt hash, not plaintext - should not be used for verification
+	// currentPassword stores the BCrypt hash (not plaintext) for the current session
+	// This field is maintained for potential backwards compatibility but should NOT be used for password verification
+	// Password verification must use BCrypt.checkpw() in the login methods
+	private String currentPassword;
 	private String currentFirstName;
 	private String currentMiddleName;
 	private String currentLastName;
@@ -419,7 +422,7 @@ public class Database {
 			pstmt.setString(1, username);
 	        try (ResultSet rs = pstmt.executeQuery()) {
 	            if (rs.next()) {
-	                return rs.getString("firstName");
+	                return rs.getString("preferredFirstName");
 	            }
 	        }
 	    } catch (SQLException e) {
