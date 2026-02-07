@@ -65,7 +65,8 @@ public class Database {
 			String invitationCodesTable = "CREATE TABLE IF NOT EXISTS InvitationCodes ("
 				+ "code VARCHAR(10) PRIMARY KEY, "
 				+ "emailAddress VARCHAR(255), "
-				+ "role VARCHAR(10))";
+				+ "role VARCHAR(10), "
+				+ "deadline VARCHAR(255))";
 			statement.execute(invitationCodesTable);
 	}
 
@@ -202,11 +203,27 @@ public class Database {
 
 	public String generateInvitationCode(String emailAddress, String role) {
 	    String code = UUID.randomUUID().toString().substring(0, 6);
-	    String query = "INSERT INTO InvitationCodes (code, emailaddress, role) VALUES (?, ?, ?)";
+	    String query = "INSERT INTO InvitationCodes (code, emailaddress, role, deadline) VALUES (?, ?, ?, ?)";
 	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        pstmt.setString(1, code);
 	        pstmt.setString(2, emailAddress);
 	        pstmt.setString(3, role);
+	        pstmt.setString(4, "");
+	        pstmt.executeUpdate();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return code;
+	}
+	
+	public String generateInvitationCode(String emailAddress, String role, String deadline) {
+	    String code = UUID.randomUUID().toString().substring(0, 6);
+	    String query = "INSERT INTO InvitationCodes (code, emailaddress, role, deadline) VALUES (?, ?, ?, ?)";
+	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        pstmt.setString(1, code);
+	        pstmt.setString(2, emailAddress);
+	        pstmt.setString(3, role);
+	        pstmt.setString(4, deadline);
 	        pstmt.executeUpdate();
 	    } catch (SQLException e) {
 	        e.printStackTrace();
@@ -516,5 +533,92 @@ public class Database {
 		} catch(SQLException se){ 
 			se.printStackTrace(); 
 		} 
+	}
+	
+	// AD-1: Get invitation deadline
+	public String getInvitationDeadline(String code) {
+	    String query = "SELECT deadline FROM InvitationCodes WHERE code = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        pstmt.setString(1, code);
+	        ResultSet rs = pstmt.executeQuery();
+	        if (rs.next()) {
+	            return rs.getString("deadline");
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return "";
+	}
+	
+	// AD-2: Update password
+	public void updatePassword(String username, String newPassword) {
+	    String query = "UPDATE userDB SET password = ? WHERE username = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        pstmt.setString(1, newPassword);
+	        pstmt.setString(2, username);
+	        pstmt.executeUpdate();
+	        if (username.equals(currentUsername)) {
+	            currentPassword = newPassword;
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	}
+	
+	// AD-2: Set one-time password
+	public void setOneTimePassword(String username, String otp) {
+	    updatePassword(username, otp);
+	}
+	
+	// AD-3: Delete user
+	public void deleteUser(String username) {
+	    String query = "DELETE FROM userDB WHERE username = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        pstmt.setString(1, username);
+	        pstmt.executeUpdate();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	}
+	
+	// AD-4: Get all users
+	public List<User> getAllUsers() {
+	    List<User> users = new ArrayList<>();
+	    String query = "SELECT * FROM userDB";
+	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        ResultSet rs = pstmt.executeQuery();
+	        while (rs.next()) {
+	            User user = new User(
+	                rs.getString("userName"),
+	                rs.getString("password"),
+	                rs.getString("firstName"),
+	                rs.getString("middleName"),
+	                rs.getString("lastName"),
+	                rs.getString("preferredFirstName"),
+	                rs.getString("emailAddress"),
+	                rs.getBoolean("adminRole"),
+	                rs.getBoolean("newRole1"),
+	                rs.getBoolean("newRole2")
+	            );
+	            users.add(user);
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return users;
+	}
+	
+	// AD-5: Count admins
+	public int countAdmins() {
+	    String query = "SELECT COUNT(*) AS count FROM userDB WHERE adminRole = TRUE";
+	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        ResultSet rs = pstmt.executeQuery();
+	        if (rs.next()) {
+	            return rs.getInt("count");
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return 0;
 	}
 }
