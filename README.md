@@ -177,7 +177,7 @@ TP1/
 - **Dependencies**: 
   - JUnit 5 for testing
   - H2 Database Engine (embedded)
-  - BCrypt implementation included in `src/util/BCrypt.java`
+  - jBCrypt library v0.4 (org.mindrot:jbcrypt) included in `lib/jbcrypt-0.4.jar`
 
 ### Running Tests
 ```bash
