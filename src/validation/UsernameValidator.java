@@ -4,7 +4,7 @@ public class UsernameValidator {
     
     private static final int MIN_LENGTH = 6;
     private static final int MAX_LENGTH = 32;
-    private static final String ALLOWED_SPECIAL_CHARS = "_@#$!";
+    private static final String ALLOWED_SPECIAL_CHARS = "_#$!";
     
     /**
      * Validates a username according to the rules:
@@ -12,7 +12,7 @@ public class UsernameValidator {
      * - Must be 6-32 characters
      * - Must start with a letter
      * - No spaces allowed
-     * - Allowed characters: A-Z a-z 0-9 _ @ # $ !
+     * - Allowed characters: A-Z a-z 0-9 _ # $ !
      * 
      * @param username The username to validate (will be trimmed)
      * @return Empty string if valid, error message if invalid
