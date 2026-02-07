@@ -62,19 +62,19 @@ public class ViewUserLogin {
         setupTextUI(text_Password, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 210, true);
         text_Password.setPromptText("Enter Password");
         setupButtonUI(button_Login, "Dialog", 18, 200, Pos.CENTER, 475, 180);
-        button_Login.setOnAction((_) -> {ControllerUserLogin.doLogin(theStage); });
+        button_Login.setOnAction((e) -> {ControllerUserLogin.doLogin(theStage); });
         alertUsernamePasswordError.setTitle("Invalid username/password!");
         alertUsernamePasswordError.setHeaderText(null);
         setupLabelUI(label_AccountSetupInsrtuctions, "Arial", 18, width, Pos.BASELINE_LEFT, 20, 300);
         setupTextUI(text_Invitation, "Arial", 18, 300, Pos.BASELINE_LEFT, 50, 340, true);
         text_Invitation.setPromptText("Enter Invitation Code");
         setupButtonUI(button_SetupAccount, "Dialog", 18, 200, Pos.CENTER, 475, 340);
-        button_SetupAccount.setOnAction((_) -> {
+        button_SetupAccount.setOnAction((e) -> {
             System.out.println("**** Calling doSetupAccount");
             ControllerUserLogin.doSetupAccount(theStage, text_Invitation.getText());
         });
         setupButtonUI(button_Quit, "Dialog", 18, 250, Pos.CENTER, 300, 520);
-        button_Quit.setOnAction((_) -> {ControllerUserLogin.performQuit(); });
+        button_Quit.setOnAction((e) -> {ControllerUserLogin.performQuit(); });
         theRootPane.getChildren().addAll(
                 label_ApplicationTitle, 
                 label_OperationalStartTitle,

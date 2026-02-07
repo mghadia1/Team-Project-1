@@ -86,9 +86,9 @@ public class ViewNewAccount {
         text_Email.setPromptText("Email Address");
         
         setupButtonUI(button_Create, "Dialog", 16, 200, Pos.CENTER, 220, 450);
-        button_Create.setOnAction((_) -> {ControllerNewAccount.doCreateUser(theStage, invitationCode); });
+        button_Create.setOnAction((e) -> {ControllerNewAccount.doCreateUser(theStage, invitationCode); });
         setupButtonUI(button_Cancel, "Dialog", 16, 200, Pos.CENTER, 440, 450);
-        button_Cancel.setOnAction((_) -> {guiUserLogin.ViewUserLogin.displayUserLogin(theStage); });
+        button_Cancel.setOnAction((e) -> {guiUserLogin.ViewUserLogin.displayUserLogin(theStage); });
         
         alertError.setTitle("Account Creation Error");
         alertError.setHeaderText(null);

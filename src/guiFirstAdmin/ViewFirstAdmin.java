@@ -54,7 +54,7 @@ public class ViewFirstAdmin {
         setupTextUI(text_ConfirmPassword, "Arial", 18, 300, Pos.BASELINE_LEFT, 250, 240, true);
         text_ConfirmPassword.setPromptText("Confirm Password");
         setupButtonUI(button_Setup, "Dialog", 18, 200, Pos.CENTER, 300, 290);
-        button_Setup.setOnAction((_) -> {ControllerFirstAdmin.doSetupAdmin(theStage); });
+        button_Setup.setOnAction((e) -> {ControllerFirstAdmin.doSetupAdmin(theStage); });
         setupLabelUI(label_PasswordsDoNotMatch, "Arial", 14, width, Pos.CENTER, 0, 340);
         label_PasswordsDoNotMatch.setStyle("-fx-text-fill: red;");
         theRootPane.getChildren().addAll(

@@ -56,7 +56,7 @@ public class ViewAddRemoveRoles {
         combo_Users.setLayoutX(250);
         combo_Users.setLayoutY(130);
         combo_Users.setMinWidth(300);
-        combo_Users.setOnAction((_) -> {ControllerAddRemoveRoles.onUserSelected(); });
+        combo_Users.setOnAction((e) -> {ControllerAddRemoveRoles.onUserSelected(); });
         
         check_Admin.setLayoutX(280);
         check_Admin.setLayoutY(180);
@@ -71,9 +71,9 @@ public class ViewAddRemoveRoles {
         check_Role2.setFont(Font.font("Arial", 16));
         
         setupButtonUI(button_Save, "Dialog", 16, 200, Pos.CENTER, 220, 340);
-        button_Save.setOnAction((_) -> {ControllerAddRemoveRoles.performSave(theStage, currentUser); });
+        button_Save.setOnAction((e) -> {ControllerAddRemoveRoles.performSave(theStage, currentUser); });
         setupButtonUI(button_Back, "Dialog", 16, 200, Pos.CENTER, 440, 340);
-        button_Back.setOnAction((_) -> {guiAdminHome.ViewAdminHome.displayAdminHome(theStage, currentUser); });
+        button_Back.setOnAction((e) -> {guiAdminHome.ViewAdminHome.displayAdminHome(theStage, currentUser); });
         
         theRootPane.getChildren().addAll(
                 label_ApplicationTitle,

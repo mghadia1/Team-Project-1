@@ -45,10 +45,10 @@ public class ViewRole1Home {
         setupLabelUI(label_Welcome, "Arial", 20, width, Pos.CENTER, 0, 110);
         
         setupButtonUI(button_UpdateAccount, "Dialog", 16, 250, Pos.CENTER, 275, 200);
-        button_UpdateAccount.setOnAction((_) -> {guiUserUpdate.ViewUserUpdate.displayUserUpdate(theStage, currentUser); });
+        button_UpdateAccount.setOnAction((e) -> {guiUserUpdate.ViewUserUpdate.displayUserUpdate(theStage, currentUser); });
         
         setupButtonUI(button_Logout, "Dialog", 16, 250, Pos.CENTER, 275, 300);
-        button_Logout.setOnAction((_) -> {guiUserLogin.ViewUserLogin.displayUserLogin(theStage); });
+        button_Logout.setOnAction((e) -> {guiUserLogin.ViewUserLogin.displayUserLogin(theStage); });
         
         theRootPane.getChildren().addAll(
                 label_ApplicationTitle,

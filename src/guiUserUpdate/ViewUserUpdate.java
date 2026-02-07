@@ -69,9 +69,9 @@ public class ViewUserUpdate {
         text_Email.setPromptText("Email Address");
         
         setupButtonUI(button_Save, "Dialog", 16, 200, Pos.CENTER, 220, 380);
-        button_Save.setOnAction((_) -> {ControllerUserUpdate.doSave(theStage, currentUser); });
+        button_Save.setOnAction((e) -> {ControllerUserUpdate.doSave(theStage, currentUser); });
         setupButtonUI(button_Back, "Dialog", 16, 200, Pos.CENTER, 440, 380);
-        button_Back.setOnAction((_) -> {ControllerUserUpdate.doBack(theStage, currentUser); });
+        button_Back.setOnAction((e) -> {ControllerUserUpdate.doBack(theStage, currentUser); });
         
         theRootPane.getChildren().addAll(
                 label_ApplicationTitle,

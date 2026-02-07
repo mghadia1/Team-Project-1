@@ -50,25 +50,25 @@ public class ViewAdminHome {
         setupLabelUI(label_Welcome, "Arial", 20, width, Pos.CENTER, 0, 70);
         
         setupButtonUI(button_InviteUser, "Dialog", 16, 250, Pos.CENTER, 275, 130);
-        button_InviteUser.setOnAction((_) -> {ControllerAdminHome.performInvitation(theStage, currentUser); });
+        button_InviteUser.setOnAction((e) -> {ControllerAdminHome.performInvitation(theStage, currentUser); });
         
         setupButtonUI(button_ResetPassword, "Dialog", 16, 250, Pos.CENTER, 275, 180);
-        button_ResetPassword.setOnAction((_) -> {ControllerAdminHome.setOnetimePassword(theStage, currentUser); });
+        button_ResetPassword.setOnAction((e) -> {ControllerAdminHome.setOnetimePassword(theStage, currentUser); });
         
         setupButtonUI(button_DeleteUser, "Dialog", 16, 250, Pos.CENTER, 275, 230);
-        button_DeleteUser.setOnAction((_) -> {ControllerAdminHome.deleteUser(theStage, currentUser); });
+        button_DeleteUser.setOnAction((e) -> {ControllerAdminHome.deleteUser(theStage, currentUser); });
         
         setupButtonUI(button_ListUsers, "Dialog", 16, 250, Pos.CENTER, 275, 280);
-        button_ListUsers.setOnAction((_) -> {ControllerAdminHome.listUsers(theStage, currentUser); });
+        button_ListUsers.setOnAction((e) -> {ControllerAdminHome.listUsers(theStage, currentUser); });
         
         setupButtonUI(button_ManageRoles, "Dialog", 16, 250, Pos.CENTER, 275, 330);
-        button_ManageRoles.setOnAction((_) -> {guiAddRemoveRoles.ViewAddRemoveRoles.displayAddRemoveRoles(theStage, currentUser); });
+        button_ManageRoles.setOnAction((e) -> {guiAddRemoveRoles.ViewAddRemoveRoles.displayAddRemoveRoles(theStage, currentUser); });
         
         setupButtonUI(button_UpdateAccount, "Dialog", 16, 250, Pos.CENTER, 275, 380);
-        button_UpdateAccount.setOnAction((_) -> {guiUserUpdate.ViewUserUpdate.displayUserUpdate(theStage, currentUser); });
+        button_UpdateAccount.setOnAction((e) -> {guiUserUpdate.ViewUserUpdate.displayUserUpdate(theStage, currentUser); });
         
         setupButtonUI(button_Logout, "Dialog", 16, 250, Pos.CENTER, 275, 480);
-        button_Logout.setOnAction((_) -> {guiUserLogin.ViewUserLogin.displayUserLogin(theStage); });
+        button_Logout.setOnAction((e) -> {guiUserLogin.ViewUserLogin.displayUserLogin(theStage); });
         
         theRootPane.getChildren().addAll(
                 label_ApplicationTitle,

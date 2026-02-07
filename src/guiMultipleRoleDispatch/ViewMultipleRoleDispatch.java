@@ -52,16 +52,16 @@ public class ViewMultipleRoleDispatch {
         setupLabelUI(label_Instructions, "Arial", 18, width, Pos.CENTER, 0, 110);
         
         setupButtonUI(button_Admin, "Dialog", 18, 250, Pos.CENTER, 275, 180);
-        button_Admin.setOnAction((_) -> {ControllerMultipleRoleDispatch.selectAdminRole(theStage, currentUser); });
+        button_Admin.setOnAction((e) -> {ControllerMultipleRoleDispatch.selectAdminRole(theStage, currentUser); });
         
         setupButtonUI(button_Role1, "Dialog", 18, 250, Pos.CENTER, 275, 240);
-        button_Role1.setOnAction((_) -> {ControllerMultipleRoleDispatch.selectRole1(theStage, currentUser); });
+        button_Role1.setOnAction((e) -> {ControllerMultipleRoleDispatch.selectRole1(theStage, currentUser); });
         
         setupButtonUI(button_Role2, "Dialog", 18, 250, Pos.CENTER, 275, 300);
-        button_Role2.setOnAction((_) -> {ControllerMultipleRoleDispatch.selectRole2(theStage, currentUser); });
+        button_Role2.setOnAction((e) -> {ControllerMultipleRoleDispatch.selectRole2(theStage, currentUser); });
         
         setupButtonUI(button_Logout, "Dialog", 18, 250, Pos.CENTER, 275, 400);
-        button_Logout.setOnAction((_) -> {guiUserLogin.ViewUserLogin.displayUserLogin(theStage); });
+        button_Logout.setOnAction((e) -> {guiUserLogin.ViewUserLogin.displayUserLogin(theStage); });
         
         theRootPane.getChildren().addAll(
                 label_ApplicationTitle,
