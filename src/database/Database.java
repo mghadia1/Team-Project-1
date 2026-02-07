@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 import entityClasses.User;
-import util.BCrypt;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class Database {
 
