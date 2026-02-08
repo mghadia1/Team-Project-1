@@ -65,22 +65,30 @@ The team selected **Instagram (Web)** as the UI design inspiration for its profe
 ## 📂 Project Structure
 
 ```
-TP1/
-├── TP1 Source Code/           # Java/JavaFX application source code
-├── TP1 Design Documents/      # UML architecture & detailed design (Astah)
-├── TP1 Scrum Standup Video Recordings/
-│   ├── TP1 Scrum Standup 2026-02-05.mp4
-│   ├── TP1 Scrum Standup 2026-02-07.mp4
-│   └── ...
-├── TP1-Team32 Team Norms.pdf
-├── User Experience.pdf
-├── Input Validation.pdf
-├── Sprint Backlog.pdf
-├── TP1 Plan.pdf
-├── TP1 Test Cases.pdf
-├── TP1 Functional Requirements Validated.mp4
-├── TP1 Flow Explained.mp4
-└── README.md
+Team-Project-1/
+├── README.md
+├── .gitignore
+├── FoundationsSP26-TP1/               # Main JavaFX application (MVC)
+│   ├── src/
+│   │   ├── applicationMain/           # App entry point
+│   │   ├── database/                  # H2 database layer
+│   │   ├── entityClasses/             # User entity
+│   │   ├── guiUserLogin/              # Login UI (MVC)
+│   │   ├── guiFirstAdmin/             # First admin setup (MVC)
+│   │   ├── guiNewAccount/             # Account creation (MVC)
+│   │   ├── guiAdminHome/              # Admin dashboard (MVC)
+│   │   ├── guiUserUpdate/             # User update (MVC)
+│   │   ├── guiAddRemoveRoles/         # Role management (MVC)
+│   │   ├── guiMultipleRoleDispatch/   # Role selection (MVC)
+│   │   ├── guiRole1/ & guiRole2/      # Role-specific views
+│   │   ├── guiTools/                  # Shared UI utilities
+│   │   └── module-info.java
+│   ├── .classpath
+│   └── .project
+├── PasswordEvaluationTestbed-SP26-TP1/ # Password validation testbed
+│   └── src/
+└── UserNameRecognizerTestbed-SP26/     # Username validation testbed (FSM)
+    └── src/
 ```
 
 ---
