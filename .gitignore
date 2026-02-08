@@ -1,0 +1,29 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Java compiled files
+*.class
+*.jar
+*.war
+*.ear
+
+# Eclipse IDE
+bin/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.loadpath
+.recommenders
+
+# Build output
+build/
+out/
+target/
+
+# H2 Database files
+*.db
+*.trace.db
+*.lock.db
