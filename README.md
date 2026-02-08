@@ -102,18 +102,18 @@ TP1/
 
 | ID | User Story | Owner | Target | Status |
 |----|-----------|-------|--------|--------|
-| AD-1 | As an admin, I can invite users using a one-time code and deadline | Mayank Ghadia | Feb 8 | 🔄 In Progress |
-| AD-2 | As an admin, I can reset a user's password using a one-time password | Shorya Moses | Feb 8 | 🔄 In Progress |
-| AD-3 | As an admin, I can delete a user account with confirmation | Meet Sutariya | Feb 8 | 🔄 In Progress |
-| AD-4 | As an admin, I can list all user accounts | Perran Walia | Feb 8 | 🔄 In Progress |
-| AD-5 | As an admin, I can add or remove roles while ensuring at least one admin exists | Meet Sutariya | Feb 8 | 🔄 In Progress |
+| AD-1 | As an admin, I can invite users using a one-time code and deadline | Mayank Ghadia | Feb 8 | ✅ Done |
+| AD-2 | As an admin, I can reset a user's password using a one-time password | Shorya Moses | Feb 8 | ✅ Done |
+| AD-3 | As an admin, I can delete a user account with confirmation | Meet Sutariya | Feb 8 | ✅ Done |
+| AD-4 | As an admin, I can list all user accounts | Perran Walia | Feb 8 | ✅ Done |
+| AD-5 | As an admin, I can add or remove roles while ensuring at least one admin exists | Meet Sutariya | Feb 8 | ✅ Done |
 
 ### Testing & Documentation
 
 | ID | Description | Owner | Target | Status |
 |----|------------|-------|--------|--------|
-| TEST-1 | Automated tests for username validation | Perran Walia | Feb 8 | ⬜ To Do |
-| TEST-2 | Automated tests for password evaluator | Mayank Ghadia | Feb 8 | ⬜ To Do |
+| TEST-1 | Automated tests for username validation | Perran Walia | Feb 8 | ✅ Done |
+| TEST-2 | Automated tests for password evaluator | Mayank Ghadia | Feb 8 | ✅ Done |
 | DOC-1 | UML updates (architecture + detailed design) | Shorya Moses | Feb 8 | 🔄 In Progress |
 | DOC-2 | Final documentation consistency review | Meet Sutariya | Feb 9 | ⬜ To Do |
 
@@ -132,8 +132,8 @@ TP1/
 
 | Field | Required | Min | Max | Rules | Allowed Characters |
 |-------|----------|-----|-----|-------|--------------------|
-| **Username** | Yes | 6 | 32 | Must start with a letter, no spaces | `A-Z a-z 0-9 _ @ # $ !` |
-| **Password** | Yes | 8 | 16 | Must include: 1 uppercase, 1 lowercase, 1 digit, 1 special char | `A-Z a-z 0-9 _ @ # $ !` |
+| **Username** | Yes | 6 | 32 | Must start with a letter, no spaces | `A-Z a-z 0-9 _ # $ !` |
+| **Password** | Yes | 8 | 64 | Must include: 1 uppercase, 1 lowercase, 1 digit, 1 special char | `A-Z a-z 0-9 _ @ # $ !` |
 | **Confirm Password** | Yes | — | — | Must exactly match new password | — |
 | **Full Name** | Yes | 4 | 32 | No digits or special symbols | `A-Z a-z - '` |
 | **Email** | Yes | 4 | 32 | Must follow `local@domain` format, no spaces | Standard email characters |
@@ -152,6 +152,48 @@ TP1/
 - Invalid characters are rejected immediately
 - Input is not processed unless all validation rules pass
 - Admin privileges do not bypass validation
+
+---
+
+## 🔒 Security Checklist
+
+### Password Security
+- **BCrypt Hashing**: All passwords are hashed using BCrypt with a cost factor of 12 before storage
+- **No Plaintext Storage**: Passwords are NEVER stored in plaintext in the database
+- **Secure Verification**: Password verification uses BCrypt's constant-time comparison to prevent timing attacks
+- **Strong Requirements**: Minimum 8 characters with complexity requirements enforced
+
+### Database Security
+- **Location**: Database file stored at `~/FoundationDatabase` (H2 database)
+- **Backup Recommendations**: 
+  - Regular backups of `~/FoundationDatabase.*` files
+  - Store backups in secure, encrypted location
+  - Test restore procedures periodically
+- **Access Control**: Database file should have restricted file permissions (600 or 400)
+
+### Development Environment
+- **Recommended JDK**: Java 17+ (OpenJDK or Oracle JDK)
+- **JavaFX SDK**: JavaFX 17+ required for GUI components
+- **Dependencies**: 
+  - JUnit 5 for testing
+  - H2 Database Engine (embedded)
+  - jBCrypt library v0.4 (org.mindrot:jbcrypt) included in `lib/jbcrypt-0.4.jar`
+
+### Running Tests
+```bash
+# Using Eclipse: Right-click test class → Run As → JUnit Test
+# Using command line with JUnit console launcher:
+java -jar junit-platform-console-standalone.jar --class-path out --scan-classpath
+
+# Run specific test class:
+java -jar junit-platform-console-standalone.jar --class-path out --select-class test.validation.PasswordValidatorTest
+```
+
+### Security Notes
+- ✅ All database operations use try-with-resources to prevent resource leaks
+- ✅ Prepared statements used throughout to prevent SQL injection
+- ✅ Input validation enforced before any database operations
+- ✅ Password hashing cost factor can be adjusted via `BCRYPT_COST_FACTOR` constant in `Database.java` if needed for future hardware
 
 ---
 
@@ -188,7 +230,7 @@ TP1/
 | P-02 | Missing uppercase | `aa1!aaaa` | ❌ Rejected |
 | P-03 | Missing lowercase | `AA1!AAAA` | ❌ Rejected |
 | P-04 | Missing digit | `Aa!aaaaa` | ❌ Rejected |
-| P-11 | Too long (17 chars) | 17-char password | ❌ Rejected — too long |
+| P-11 | Too long (65 chars) | 65-char password | ❌ Rejected — too long |
 
 > 📄 **Full test case details are in `TP1 Test Cases.pdf`**
 

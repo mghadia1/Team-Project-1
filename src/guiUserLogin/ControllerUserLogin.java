@@ -43,15 +43,7 @@ public class ControllerUserLogin {
             return;
         }
         
-        String actualPassword = theDatabase.getCurrentPassword();
-        
-        if (password.compareTo(actualPassword) != 0) {
-            ViewUserLogin.alertUsernamePasswordError.setContentText(
-                    "Incorrect username/password. Try again!");
-            ViewUserLogin.alertUsernamePasswordError.showAndWait();
-            return;
-        }
-        
+        // Create user object for login verification (password will be verified by BCrypt in login methods)
         User user = new User(username, password, theDatabase.getCurrentFirstName(), 
                 theDatabase.getCurrentMiddleName(), theDatabase.getCurrentLastName(), 
                 theDatabase.getCurrentPreferredFirstName(), theDatabase.getCurrentEmailAddress(), 

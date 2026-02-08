@@ -19,15 +19,15 @@ public class UsernameValidatorTest {
     
     @Test
     public void testU02_ValidUsernameWithSpecialChars() {
-        // Valid username with special characters
-        String result = UsernameValidator.validate("User_@1");
+        // Valid username with special characters (@ removed)
+        String result = UsernameValidator.validate("User_#1");
         assertEquals("", result, "Valid username with special chars should be accepted");
     }
     
     @Test
     public void testU03_ValidUsernameAllSpecialChars() {
-        // Valid username with all allowed special characters
-        String result = UsernameValidator.validate("User_@#$!");
+        // Valid username with all allowed special characters (without @)
+        String result = UsernameValidator.validate("User_#$!");
         assertEquals("", result, "Valid username with all special chars should be accepted");
     }
     
@@ -94,5 +94,12 @@ public class UsernameValidatorTest {
         // Whitespace should be trimmed before validation
         String result = UsernameValidator.validate("  Meet12  ");
         assertEquals("", result, "Username with leading/trailing whitespace should be trimmed and accepted");
+    }
+    
+    @Test
+    public void testU13_AtSignRejected() {
+        // @ character should now be rejected
+        String result = UsernameValidator.validate("User@123");
+        assertEquals("Username can only contain letters, numbers, and special characters.", result);
     }
 }

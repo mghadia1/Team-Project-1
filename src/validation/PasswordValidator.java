@@ -3,13 +3,13 @@ package validation;
 public class PasswordValidator {
     
     private static final int MIN_LENGTH = 8;
-    private static final int MAX_LENGTH = 16;
+    private static final int MAX_LENGTH = 64;
     private static final String ALLOWED_SPECIAL_CHARS = "_@#$!";
     
     /**
      * Validates a password according to the rules:
      * - Required (not null or empty)
-     * - Must be 8-16 characters
+     * - Must be 8-64 characters
      * - Must include at least one uppercase letter
      * - Must include at least one lowercase letter
      * - Must include at least one digit
@@ -35,7 +35,7 @@ public class PasswordValidator {
         
         // Check maximum length
         if (password.length() > MAX_LENGTH) {
-            return "Password is too long (max 16 characters).";
+            return "Password is too long (max 64 characters).";
         }
         
         // Flags for password requirements

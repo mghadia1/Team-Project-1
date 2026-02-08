@@ -68,8 +68,9 @@ public class PasswordValidatorTest {
     
     @Test
     public void testP09_MaximumLength() {
-        // Maximum valid length (16 chars)
-        String result = PasswordValidator.validate("Aa1!aaaaaaaaaaaa");
+        // Maximum valid length (64 chars)
+        String password = "Aa1!" + "a".repeat(60);  // 64 total chars
+        String result = PasswordValidator.validate(password);
         assertEquals("", result, "Password with maximum length should be accepted");
     }
     
@@ -82,9 +83,10 @@ public class PasswordValidatorTest {
     
     @Test
     public void testP11_TooLong() {
-        // P-11: Too long (17 chars)
-        String result = PasswordValidator.validate("Aa1!aaaaaaaaaaaaa");
-        assertEquals("Password is too long (max 16 characters).", result);
+        // P-11: Too long (65 chars)
+        String password = "Aa1!" + "a".repeat(61);  // 65 total chars
+        String result = PasswordValidator.validate(password);
+        assertEquals("Password is too long (max 64 characters).", result);
     }
     
     @Test

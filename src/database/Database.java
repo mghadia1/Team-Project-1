@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 import entityClasses.User;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class Database {
 
@@ -18,11 +19,18 @@ public class Database {
 
 	static final String USER = "sa"; 
 	static final String PASS = ""; 
+	
+	// BCrypt cost factor for password hashing (2^12 rounds)
+	private static final int BCRYPT_COST_FACTOR = 12;
 
 	private Connection connection = null;
 	private Statement statement = null;
 	
 	private String currentUsername;
+	// DEPRECATED: currentPassword stores the BCrypt hash (not plaintext) for the current session
+	// This field is NO LONGER USED for password verification and should not be used
+	// Password verification MUST use BCrypt.checkpw() in the loginAdmin/Role1/Role2 methods
+	// This field is maintained only to avoid breaking potential external dependencies on getCurrentPassword()
 	private String currentPassword;
 	private String currentFirstName;
 	private String currentMiddleName;
@@ -72,8 +80,8 @@ public class Database {
 
 	public boolean isDatabaseEmpty() {
 		String query = "SELECT COUNT(*) AS count FROM userDB";
-		try {
-			ResultSet resultSet = statement.executeQuery(query);
+		try (PreparedStatement pstmt = connection.prepareStatement(query);
+		     ResultSet resultSet = pstmt.executeQuery()) {
 			if (resultSet.next()) {
 				return resultSet.getInt("count") == 0;
 			}
@@ -85,8 +93,8 @@ public class Database {
 	
 	public int getNumberOfUsers() {
 		String query = "SELECT COUNT(*) AS count FROM userDB";
-		try {
-			ResultSet resultSet = statement.executeQuery(query);
+		try (PreparedStatement pstmt = connection.prepareStatement(query);
+		     ResultSet resultSet = pstmt.executeQuery()) {
 			if (resultSet.next()) {
 				return resultSet.getInt("count");
 			}
@@ -103,8 +111,10 @@ public class Database {
 		try (PreparedStatement pstmt = connection.prepareStatement(insertUser)) {
 			currentUsername = user.getUserName();
 			pstmt.setString(1, currentUsername);
-			currentPassword = user.getPassword();
-			pstmt.setString(2, currentPassword);
+			// Hash the password using BCrypt with configured cost factor
+			String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt(BCRYPT_COST_FACTOR));
+			pstmt.setString(2, hashedPassword);
+			currentPassword = hashedPassword;  // Track hashed password in current session
 			currentFirstName = user.getFirstName();
 			pstmt.setString(3, currentFirstName);
 			currentMiddleName = user.getMiddleName();
@@ -129,8 +139,8 @@ public class Database {
 		List<String> userList = new ArrayList<String>();
 		userList.add("<Select a User>");
 		String query = "SELECT userName FROM userDB";
-		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-			ResultSet rs = pstmt.executeQuery();
+		try (PreparedStatement pstmt = connection.prepareStatement(query);
+		     ResultSet rs = pstmt.executeQuery()) {
 			while (rs.next()) {
 				userList.add(rs.getString("userName"));
 			}
@@ -141,12 +151,16 @@ public class Database {
 	}
 
 	public boolean loginAdmin(User user){
-		String query = "SELECT * FROM userDB WHERE userName = ? AND password = ? AND adminRole = TRUE";
+		String query = "SELECT * FROM userDB WHERE userName = ? AND adminRole = TRUE";
 		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 			pstmt.setString(1, user.getUserName());
-			pstmt.setString(2, user.getPassword());
-			ResultSet rs = pstmt.executeQuery();
-			return rs.next();
+			try (ResultSet rs = pstmt.executeQuery()) {
+				if (rs.next()) {
+					String storedHash = rs.getString("password");
+					// Verify password using BCrypt
+					return BCrypt.checkpw(user.getPassword(), storedHash);
+				}
+			}
 		} catch  (SQLException e) {
 			e.printStackTrace();
 		}
@@ -154,12 +168,16 @@ public class Database {
 	}
 	
 	public boolean loginRole1(User user) {
-		String query = "SELECT * FROM userDB WHERE userName = ? AND password = ? AND newRole1 = TRUE";
+		String query = "SELECT * FROM userDB WHERE userName = ? AND newRole1 = TRUE";
 		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 			pstmt.setString(1, user.getUserName());
-			pstmt.setString(2, user.getPassword());
-			ResultSet rs = pstmt.executeQuery();
-			return rs.next();
+			try (ResultSet rs = pstmt.executeQuery()) {
+				if (rs.next()) {
+					String storedHash = rs.getString("password");
+					// Verify password using BCrypt
+					return BCrypt.checkpw(user.getPassword(), storedHash);
+				}
+			}
 		} catch  (SQLException e) {
 			e.printStackTrace();
 		}
@@ -167,12 +185,16 @@ public class Database {
 	}
 
 	public boolean loginRole2(User user) {
-		String query = "SELECT * FROM userDB WHERE userName = ? AND password = ? AND newRole2 = TRUE";
+		String query = "SELECT * FROM userDB WHERE userName = ? AND newRole2 = TRUE";
 		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 			pstmt.setString(1, user.getUserName());
-			pstmt.setString(2, user.getPassword());
-			ResultSet rs = pstmt.executeQuery();
-			return rs.next();
+			try (ResultSet rs = pstmt.executeQuery()) {
+				if (rs.next()) {
+					String storedHash = rs.getString("password");
+					// Verify password using BCrypt
+					return BCrypt.checkpw(user.getPassword(), storedHash);
+				}
+			}
 		} catch  (SQLException e) {
 			e.printStackTrace();
 		}
@@ -183,9 +205,10 @@ public class Database {
 	    String query = "SELECT COUNT(*) FROM userDB WHERE userName = ?";
 	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        pstmt.setString(1, userName);
-	        ResultSet rs = pstmt.executeQuery();
-	        if (rs.next()) {
-	            return rs.getInt(1) > 0;
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            if (rs.next()) {
+	                return rs.getInt(1) > 0;
+	            }
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
@@ -233,8 +256,8 @@ public class Database {
 
 	public int getNumberOfInvitations() {
 		String query = "SELECT COUNT(*) AS count FROM InvitationCodes";
-		try {
-			ResultSet resultSet = statement.executeQuery(query);
+		try (PreparedStatement pstmt = connection.prepareStatement(query);
+		     ResultSet resultSet = pstmt.executeQuery()) {
 			if (resultSet.next()) {
 				return resultSet.getInt("count");
 			}
@@ -248,9 +271,10 @@ public class Database {
 	    String query = "SELECT COUNT(*) AS count FROM InvitationCodes WHERE emailAddress = ?";
 	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        pstmt.setString(1, emailAddress);
-	        ResultSet rs = pstmt.executeQuery();
-	        if (rs.next()) {
-	        	return rs.getInt("count")>0;
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            if (rs.next()) {
+	                return rs.getInt("count")>0;
+	            }
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
@@ -262,9 +286,10 @@ public class Database {
 	    String query = "SELECT * FROM InvitationCodes WHERE code = ?";
 	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        pstmt.setString(1, code);
-	        ResultSet rs = pstmt.executeQuery();
-	        if (rs.next()) {
-	            return rs.getString("role");
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            if (rs.next()) {
+	                return rs.getString("role");
+	            }
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
@@ -276,9 +301,10 @@ public class Database {
 	    String query = "SELECT emailAddress FROM InvitationCodes WHERE code = ?";
 	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        pstmt.setString(1, code);
-	        ResultSet rs = pstmt.executeQuery();
-	        if (rs.next()) {
-	            return rs.getString("emailAddress");
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            if (rs.next()) {
+	                return rs.getString("emailAddress");
+	            }
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
@@ -290,18 +316,19 @@ public class Database {
 	    String query = "SELECT COUNT(*) AS count FROM InvitationCodes WHERE code = ?";
 	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        pstmt.setString(1, code);
-	        ResultSet rs = pstmt.executeQuery();
-	        if (rs.next()) {
-	        	int counter = rs.getInt(1);
-	        	if (counter > 0) {
-					query = "DELETE FROM InvitationCodes WHERE code = ?";
-					try (PreparedStatement pstmt2 = connection.prepareStatement(query)) {
-						pstmt2.setString(1, code);
-						pstmt2.executeUpdate();
-					}catch (SQLException e) {
-						e.printStackTrace();
-					}
-	         	}
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            if (rs.next()) {
+	                int counter = rs.getInt(1);
+	                if (counter > 0) {
+						query = "DELETE FROM InvitationCodes WHERE code = ?";
+						try (PreparedStatement pstmt2 = connection.prepareStatement(query)) {
+							pstmt2.setString(1, code);
+							pstmt2.executeUpdate();
+						}catch (SQLException e) {
+							e.printStackTrace();
+						}
+	         	    }
+	            }
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
@@ -313,9 +340,10 @@ public class Database {
 		String query = "SELECT firstName FROM userDB WHERE userName = ?";
 		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 			pstmt.setString(1, username);
-	        ResultSet rs = pstmt.executeQuery();
-	        if (rs.next()) {
-	            return rs.getString("firstName");
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            if (rs.next()) {
+	                return rs.getString("firstName");
+	            }
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
@@ -339,9 +367,10 @@ public class Database {
 		String query = "SELECT MiddleName FROM userDB WHERE userName = ?";
 		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 			pstmt.setString(1, username);
-	        ResultSet rs = pstmt.executeQuery();
-	        if (rs.next()) {
-	            return rs.getString("middleName");
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            if (rs.next()) {
+	                return rs.getString("middleName");
+	            }
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
@@ -365,9 +394,10 @@ public class Database {
 		String query = "SELECT LastName FROM userDB WHERE userName = ?";
 		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 			pstmt.setString(1, username);
-	        ResultSet rs = pstmt.executeQuery();
-	        if (rs.next()) {
-	            return rs.getString("lastName");
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            if (rs.next()) {
+	                return rs.getString("lastName");
+	            }
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
@@ -391,9 +421,10 @@ public class Database {
 		String query = "SELECT preferredFirstName FROM userDB WHERE userName = ?";
 		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 			pstmt.setString(1, username);
-	        ResultSet rs = pstmt.executeQuery();
-	        if (rs.next()) {
-	            return rs.getString("firstName");
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            if (rs.next()) {
+	                return rs.getString("preferredFirstName");
+	            }
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
@@ -417,9 +448,10 @@ public class Database {
 		String query = "SELECT emailAddress FROM userDB WHERE userName = ?";
 		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 			pstmt.setString(1, username);
-	        ResultSet rs = pstmt.executeQuery();
-	        if (rs.next()) {
-	            return rs.getString("emailAddress");
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            if (rs.next()) {
+	                return rs.getString("emailAddress");
+	            }
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
@@ -443,19 +475,20 @@ public class Database {
 		String query = "SELECT * FROM userDB WHERE username = ?";
 		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 			pstmt.setString(1, username);
-	        ResultSet rs = pstmt.executeQuery();
-			rs.next();
-			currentUsername = rs.getString(2);
-			currentPassword = rs.getString(3);
-			currentFirstName = rs.getString(4);
-			currentMiddleName = rs.getString(5);
-			currentLastName = rs.getString(6);
-			currentPreferredFirstName = rs.getString(7);
-			currentEmailAddress = rs.getString(8);
-			currentAdminRole = rs.getBoolean(9);
-			currentNewRole1 = rs.getBoolean(10);
-			currentNewRole2 = rs.getBoolean(11);
-			return true;
+	        try (ResultSet rs = pstmt.executeQuery()) {
+				rs.next();
+				currentUsername = rs.getString(2);
+				currentPassword = rs.getString(3);
+				currentFirstName = rs.getString(4);
+				currentMiddleName = rs.getString(5);
+				currentLastName = rs.getString(6);
+				currentPreferredFirstName = rs.getString(7);
+				currentEmailAddress = rs.getString(8);
+				currentAdminRole = rs.getBoolean(9);
+				currentNewRole1 = rs.getBoolean(10);
+				currentNewRole2 = rs.getBoolean(11);
+				return true;
+	        }
 		} catch (SQLException e) {
 			return false;
 		}
@@ -511,15 +544,16 @@ public class Database {
 
 	public void dump() throws SQLException {
 		String query = "SELECT * FROM userDB";
-		ResultSet resultSet = statement.executeQuery(query);
-		ResultSetMetaData meta = resultSet.getMetaData();
-		while (resultSet.next()) {
-			for (int i = 0; i < meta.getColumnCount(); i++) {
-				System.out.println(meta.getColumnLabel(i + 1) + ": " + resultSet.getString(i + 1));
+		try (PreparedStatement pstmt = connection.prepareStatement(query);
+		     ResultSet resultSet = pstmt.executeQuery()) {
+			ResultSetMetaData meta = resultSet.getMetaData();
+			while (resultSet.next()) {
+				for (int i = 0; i < meta.getColumnCount(); i++) {
+					System.out.println(meta.getColumnLabel(i + 1) + ": " + resultSet.getString(i + 1));
+				}
+				System.out.println();
 			}
-			System.out.println();
 		}
-		resultSet.close();
 	}
 
 	public void closeConnection() {
@@ -540,9 +574,10 @@ public class Database {
 	    String query = "SELECT deadline FROM InvitationCodes WHERE code = ?";
 	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        pstmt.setString(1, code);
-	        ResultSet rs = pstmt.executeQuery();
-	        if (rs.next()) {
-	            return rs.getString("deadline");
+	        try (ResultSet rs = pstmt.executeQuery()) {
+	            if (rs.next()) {
+	                return rs.getString("deadline");
+	            }
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
@@ -554,11 +589,13 @@ public class Database {
 	public void updatePassword(String username, String newPassword) {
 	    String query = "UPDATE userDB SET password = ? WHERE username = ?";
 	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-	        pstmt.setString(1, newPassword);
+	        // Hash the password using BCrypt with configured cost factor
+	        String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt(BCRYPT_COST_FACTOR));
+	        pstmt.setString(1, hashedPassword);
 	        pstmt.setString(2, username);
 	        pstmt.executeUpdate();
 	        if (username.equals(currentUsername)) {
-	            currentPassword = newPassword;
+	            currentPassword = hashedPassword;  // Track hashed password in current session
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
@@ -585,8 +622,8 @@ public class Database {
 	public List<User> getAllUsers() {
 	    List<User> users = new ArrayList<>();
 	    String query = "SELECT * FROM userDB";
-	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-	        ResultSet rs = pstmt.executeQuery();
+	    try (PreparedStatement pstmt = connection.prepareStatement(query);
+	         ResultSet rs = pstmt.executeQuery()) {
 	        while (rs.next()) {
 	            User user = new User(
 	                rs.getString("userName"),
@@ -611,8 +648,8 @@ public class Database {
 	// AD-5: Count admins
 	public int countAdmins() {
 	    String query = "SELECT COUNT(*) AS count FROM userDB WHERE adminRole = TRUE";
-	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-	        ResultSet rs = pstmt.executeQuery();
+	    try (PreparedStatement pstmt = connection.prepareStatement(query);
+	         ResultSet rs = pstmt.executeQuery()) {
 	        if (rs.next()) {
 	            return rs.getInt("count");
 	        }
